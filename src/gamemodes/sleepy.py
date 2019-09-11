@@ -32,7 +32,8 @@ class SleepyMode(GameMode):
             "chk_nightdone": EventListener(self.prolong_night),
             "transition_day_begin": EventListener(self.nightmare_kill),
             "del_player": EventListener(self.happy_fun_times),
-            "revealroles": EventListener(self.on_revealroles)
+            "revealroles": EventListener(self.on_revealroles),
+            "reconfigure_stats": EventListener(self.on_reconfigure_stats)
         }
 
     def startup(self):
@@ -201,6 +202,37 @@ class SleepyMode(GameMode):
                     change_role(var, harlot, "harlot", "succubus", message="sleepy_succubus_turn")
                 for cultist in cultists:
                     change_role(var, cultist, "cultist", "demoniac", message="sleepy_demoniac_turn")
+
+    def on_reconfigure_stats(self, evt, var, roleset, reason):
+        if reason != "del_player" or evt.data["dead_role"] != "priest":
+            return
+
+        newsets = []
+        for interim in evt.data["new"]:
+            for i in range(roleset["seer"]):
+                newset = interim.copy()
+                newset["seer"] -= 1
+                newset["doomsayer"] += 1
+                newsets.append(newset)
+            evt.data["new"] = newsets
+            newsets = []
+
+        for interim in evt.data["new"]:
+            for i in range(roleset["harlot"]):
+                newset = interim.copy()
+                newset["harlot"] -= 1
+                newset["succubus"] += 1
+                newsets.append(newset)
+            evt.data["new"] = newsets
+            newsets = []
+
+        for interim in evt.data["new"]:
+            for i in range(roleset["cultist"]):
+                newset = interim.copy()
+                newset["cultist"] -= 1
+                newset["demoniac"] += 1
+                newsets.append(newset)
+            evt.data["new"] = newsets
 
     def on_revealroles(self, evt, var, wrapper):
         if self.having_nightmare:

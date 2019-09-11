@@ -1663,12 +1663,13 @@ def on_del_player(evt: Event, var, player: User, all_roles: Set[str], death_trig
     # if a stat set doesn't contain the role, then that would lead to an impossible condition and therefore
     # that set is not added to newstats to indicate that set is no longer possible
     # The reconfigure_stats event can be used to shift things around (for example, it is used to reflect wolf cub growing up)
-    event = Event("reconfigure_stats", {"new": []})
+    event = Event("reconfigure_stats", {"new": [], "dead_role": None})
     for p in possible:
         for rs in var.ROLE_STATS:
             d = Counter(dict(rs))
             if p in d and d[p] >= 1:
                 d[p] -= 1
+                event.data["dead_role"] = p
                 event.data["new"] = [d]
                 event.dispatch(var, d, "del_player")
                 for v in event.data["new"]:
