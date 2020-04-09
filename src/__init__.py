@@ -49,6 +49,7 @@ parser.add_argument('--verbose', action='store_true')
 parser.add_argument('--normal', action='store_true')
 parser.add_argument('--lagcheck', action='store_true')
 
+
 args = parser.parse_args()
 
 if args.debug: debug_mode = True
