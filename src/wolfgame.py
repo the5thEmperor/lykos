@@ -41,7 +41,7 @@ import urllib.request
 
 from collections import defaultdict, deque, Counter
 from datetime import datetime, timedelta
-from typing import Set, Optional, Callable
+from typing import Set, Optional, Callable, Tuple
 
 from oyoyo.parse import parse_nick
 
@@ -121,7 +121,7 @@ var.GAME_START_TIME = datetime.now()  # for idle checker only
 var.CAN_START_TIME = 0
 var.STARTED_DAY_PLAYERS = 0
 
-var.DISCONNECTED = {}  # players who are still alive but disconnected
+var.DISCONNECTED = UserDict() # type: UserDict[User, Tuple[datetime, str]]
 
 var.RESTARTING = False
 
@@ -241,42 +241,6 @@ def connect_callback():
 
     accumulator = accumulate_cmodes(3)
     accumulator.send(None)
-
-@hook("mode") # XXX Get rid of this when the user/channel refactor is done
-def check_for_modes(cli, rnick, chan, modeaction, *target):
-    nick = parse_nick(rnick)[0]
-    if chan != botconfig.CHANNEL:
-        return
-    oldpref = ""
-    trgt = ""
-    keeptrg = False
-    target = list(target)
-    if target and target != [users.Bot.nick]:
-        while modeaction:
-            if len(modeaction) > 1:
-                prefix = modeaction[0]
-                change = modeaction[1]
-            else:
-                prefix = oldpref
-                change = modeaction[0]
-            if not keeptrg:
-                if target:
-                    trgt = target.pop(0)
-                else:
-                    trgt = "" # Last item, no target
-            keeptrg = False
-            if not prefix in ("-", "+"):
-                change = prefix
-                prefix = oldpref
-            else:
-                oldpref = prefix
-            modeaction = modeaction[modeaction.index(change)+1:]
-            if change in var.MODES_NOSET:
-                keeptrg = True
-            if prefix == "-" and change in var.MODES_ONLYSET:
-                keeptrg = True
-            if change not in var.MODES_PREFIXES.values():
-                continue
 
 def reset_settings():
     var.CURRENT_GAMEMODE.teardown()
@@ -1818,7 +1782,7 @@ def account_change(evt, user, old_account): # FIXME: This uses var
         return # We only care about game-related changes in this function
 
     pl = get_participants()
-    if user in pl and user.account not in var.JOINED_THIS_GAME_ACCS:
+    if user in pl and user.account not in var.JOINED_THIS_GAME_ACCS and user not in var.DISCONNECTED:
         leave(var, "account", user) # this also notifies the user to change their account back
         if var.PHASE != "join":
             channels.Main.mode(["-v", user.nick])
@@ -2815,7 +2779,7 @@ def on_invite(cli, raw_nick, something, chan):
     if chan == botconfig.CHANNEL:
         cli.join(chan)
         return # No questions
-    user = users.get(raw_nick)
+    user = users.get(raw_nick, allow_none=True)
     if user and user.is_admin():
         cli.join(chan) # Allows the bot to be present in any channel
         debuglog(user.nick, "INVITE", chan, display=True)
