@@ -202,7 +202,7 @@
         "swap": ["swap", "replace"],
         "sync": ["sync", "fsync"],
         "target": ["target"],
-        "time": ["time"],
+        "time": ["time", "t"],
         "totem": ["give", "totem"],
         "update": ["update"],
         "visit": ["visit"],
@@ -334,7 +334,10 @@
         "https://i.imgur.com/VvsgyXJ.gifv",
         "https://i.imgur.com/b8HAvjL.gifv",
         "https://i.imgur.com/PIIfL15.gifv",
-        "https://i.imgur.com/nly0Cmm.gifv"
+        "https://i.imgur.com/nly0Cmm.gifv",
+        "https://i.redd.it/dstee514i5zz.jpg",
+        "https://i.imgur.com/jWFy9aV.gifv",
+        "https://i.imgur.com/aK34qpZ.gifv"
     ],
     "latency": "{0:.3f} second(s).",
     "lynch_reveal": [
