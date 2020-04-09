@@ -1,6 +1,6 @@
 import oyoyo.parse as parse
 
-def test_start_cmd():
+def test_parse_raw_irc_command():
     element = bytes(":Kevin!bncworld@I-Have.a.cool.vhost.com PRIVMSG #mIRC :I feel lucky today", encoding="utf8")
     check = parse.parse_raw_irc_command(element)
     print(check[0].decode())
