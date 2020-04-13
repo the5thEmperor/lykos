@@ -36,4 +36,23 @@ def test_get_players():
     assert check[0] == "Hoobshanker"
 
 
+def test_is_silent():
+    new = src.users.add(cli="6697", nick="Rissa09!None@None:None")
+    src.status.add_silent(var=None, user=new)
+    assert src.status.is_silent(var=None, user=new)
 
+
+def test_add_dying():
+    var.GAME_ID = 1
+    new = src.users.add(cli="6697", nick="Rissa09!None@None:None")
+    var.MAIN_ROLES = {new: "villager"}
+    var.ALL_PLAYERS = [new]
+    assert src.status.add_dying(var=var, player=new, killer_role="wolf", reason="kill")
+
+
+def test_is_dying():
+    new = src.users.add(cli="6697", nick="Rissa09!None@None:None")
+    var.MAIN_ROLES = {new: "villager"}
+    var.ALL_PLAYERS = [new]
+    src.status.add_dying(var=var, player=new, killer_role="wolf", reason="kill")
+    assert src.status.is_dying(var, new)
