@@ -1,6 +1,7 @@
 import oyoyo.parse as parse
 import src
 import src.settings as var
+from src.roles import warlock
 
 def test_parse_raw_irc_command():
     element = bytes(":Kevin!bncworld@I-Have.a.cool.vhost.com PRIVMSG #mIRC :I feel lucky today", encoding="utf8")
@@ -56,3 +57,11 @@ def test_is_dying():
     var.ALL_PLAYERS = [new]
     src.status.add_dying(var=var, player=new, killer_role="wolf", reason="kill")
     assert src.status.is_dying(var, new)
+
+
+def test_is_cursed():
+    new = src.users.add(cli="6697", nick="Rissa09!None@None:None")
+    var.MAIN_ROLES = {new: "cursed traitor"}
+    var.ALL_PLAYERS = [new]
+    warlock.is_CURSED.append(new)
+    assert warlock.is_cursed(new)
