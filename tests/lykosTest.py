@@ -1,6 +1,9 @@
 import oyoyo.parse as parse
 import src
 import src.settings as var
+import src.db.db_functions as db_func
+from src.containers import UserSet
+
 
 def test_parse_raw_irc_command():
     element = bytes( ":Kevin!bncworld@I-Have.a.cool.vhost.com PRIVMSG #mIRC :I feel lucky today", encoding="utf8" )
@@ -58,15 +61,37 @@ def test_is_dying():
     assert src.status.is_dying( var, new )
 
 
+
+def test_add_lycanthropy():
+    user = src.users.add( cli="6697", nick="chubbychicken123!None@None:None" )
+    var.MAIN_ROLES = {user: "villager"}
+    var.ALL_PLAYERS = [user]
+    src.status.add_lycanthropy(var,user,"lycan")
+    print(src.containers.UserDict)
+
 def test_wolves_diseased():
     user = src.users.add( cli="6697", nick="chubbychicken123!None@None:None" )
+    var.MAIN_ROLES = {user: "villager"}
+    var.ALL_PLAYERS = [user]
     src.status.add_disease( var=None, target=user )
-    src.status.wolves_diseased(var = None)
-    assert True
+    assert src.status.wolves_diseased(var = None) is False
 
-def test_try_misdirection():
-    user = src.users.add( cli="6697", nick="chubbychicken123!None@None:None" )
-    dist = src.users.add( cli="6697", nick="tubbyturkey123!None@None:None" )
-    src.status.add_misdirection( var = None, user= user, as_actor=False, as_target=False )
-    assert src.status.try_misdirection(var = None, actor= dist, target= user)
+
+def test_for_entry():
+    conn, cursor = db_func.open_db("db_msg.sql")
+    db_func.create_player_table(cursor)
+    cursor.execute('''INSERT INTO player(id,person,account,hostmask) VALUES(191832540,123,"chubbychicken123","filler")''')
+    result = cursor.execute('''SELECT * FROM player''')
+    entry_amount = result.fetchall()
+    db_func.drop_table_player(cursor)
+    db_func.close_db(conn)
+    assert len(entry_amount) > 0
+
+
+def test_for_table():
+    conn, cursor = db_func.open_db("database.sqlite")
+    does_exists = db_func.check_table(cursor)
+    db_func.close_db(conn)
+    assert does_exists == 1
+
 
