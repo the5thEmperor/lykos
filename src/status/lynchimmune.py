@@ -17,7 +17,7 @@ def add_lynch_immunity(var, user, reason):
 def try_lynch_immunity(var, user) -> bool:
     if user in IMMUNITY:
         reason = IMMUNITY[user].pop() # get a random reason
-        evt = Event("lynch_immunity", {"immune": False})
+        evt = Event("lynch_immunity", {"immune": True})  #changed to true
         evt.dispatch(var, user, reason)
         return evt.data["immune"]
 

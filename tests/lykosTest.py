@@ -1,4 +1,7 @@
 import oyoyo.parse as parse
+import src
+import src.settings as var
+
 
 def test_parse_raw_irc_command():
     element = bytes(":Kevin!bncworld@I-Have.a.cool.vhost.com PRIVMSG #mIRC :I feel lucky today", encoding="utf8")
@@ -12,3 +15,21 @@ def test_parse_nick():
     userName = parse.parse_nick(user)
     assert userName[0] == "mywolfbot" and userName[1] == None and userName[2] == "~mywolfbot" \
            and userName[3] == "pool-173-48-152-9.bstnma.fios.verizon.net"
+
+
+def test_try_lynch_immunity_false():
+    testPlayer = src.users.add( cli="6697", nick="chubbychicken123!None@None:None" )
+    var.MAIN_ROLES = {testPlayer: "villager"}
+    var.ALL_PLAYERS = [testPlayer]
+    check = src.status.try_lynch_immunity(var= var, user=testPlayer)
+    print(check)
+    assert src.status.try_lynch_immunity( var=None, user=testPlayer ) is False
+
+# changed false -> true lynchimmune.py line 20
+
+def test_try_lynch_immunity_true():
+    testPlayer = src.users.add( cli="6697", nick="chubbychicken123!None@None:None" )
+    var.MAIN_ROLES = {testPlayer: "villager"}
+    var.ALL_PLAYERS = [testPlayer]
+    src.status.add_lynch_immunity( var=None, user=testPlayer, reason=None )
+    assert src.status.try_lynch_immunity(var= var, user=testPlayer)
