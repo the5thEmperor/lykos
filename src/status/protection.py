@@ -1,3 +1,4 @@
+from src import users
 from src.containers import UserDict, DefaultUserDict
 from src.decorators import event_listener
 from src.functions import get_players
@@ -8,17 +9,26 @@ from src.cats import All
 __all__ = ["add_protection", "try_protection", "remove_all_protections"]
 
 PROTECTIONS = UserDict() # type: UserDict[User, UserDict[Optional[User], List[Tuple[Category, str]]]]
+players_who_are_PROTECTED = [] # created list to hold players who is protected
 
 def add_protection(var, target, protector, protector_role, scope=All):
     """Add a protection to the target affecting the relevant scope."""
     if target not in get_players():
         return
 
+    players_who_are_PROTECTED.append( target )  # appended target with protection to list
+
     if target not in PROTECTIONS:
         PROTECTIONS[target] = DefaultUserDict(list)
-
     prot_entry = (scope, protector_role)
+
     PROTECTIONS[target][protector].append(prot_entry)
+
+def check_protected(player: users.User): #function to check if player is protected
+    test = players_who_are_PROTECTED
+    if player in players_who_are_PROTECTED:
+        return True
+    return False
 
 def try_protection(var, target, attacker, attacker_role, reason):
     """Attempt to protect the player, and return a list of messages or None."""
