@@ -18,7 +18,7 @@
 # WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 # OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 # ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
+import argparse
 import copy
 import fnmatch
 import functools
@@ -788,7 +788,14 @@ def _join_player(var, wrapper, who=None, forced=False, *, sanity=True):
 
     # don't check unacked warnings on fjoin
     if wrapper.source is who and db.has_unacknowledged_warnings(temp.account):
-        wrapper.pm(messages["warn_unacked"])
+        # wrapper.pm(messages["warn_unacked"])
+
+        args = argparse.Namespace() # arg added to pass into warn list function
+        args.all = False
+        args.help = False
+        args.page = 1
+        # Called warn list function instead of messaging to use warn list to see warnings
+        src.warnings.warn_list(var, wrapper, args)
         return False
 
     cmodes = []
