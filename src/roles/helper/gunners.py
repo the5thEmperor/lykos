@@ -24,8 +24,13 @@ def setup_variables(rolename):
         if not target:
             return
         if check_protected( target ):
+
+            GUNNERS[wrapper.source] -= 1
+            wrapper.send( messages["shoot_at_protected"].format( wrapper.source, target ) )
+
             return
         target = try_misdirection(var, wrapper.source, target)
+
         if try_exchange(var, wrapper.source, target):
             return
 
