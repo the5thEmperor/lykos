@@ -2,13 +2,13 @@ import oyoyo.parse as parse
 import src
 import src.settings as var
 
-
 def test_parse_raw_irc_command():
     element = bytes(":Kevin!bncworld@I-Have.a.cool.vhost.com PRIVMSG #mIRC :I feel lucky today", encoding="utf8")
     check = parse.parse_raw_irc_command(element)
     print(check[0].decode())
     assert check[0].decode() == "Kevin!bncworld@I-Have.a.cool.vhost.com" and check[1] == "privmsg" \
            and check[2][0].decode() == "#mIRC" and check[2][1].decode() == 'I feel lucky today'
+
 
 def test_parse_nick():
     user = "mywolfbot!~mywolfbot@pool-173-48-152-9.bstnma.fios.verizon.net"
@@ -17,19 +17,23 @@ def test_parse_nick():
            and userName[3] == "pool-173-48-152-9.bstnma.fios.verizon.net"
 
 
-def test_try_lynch_immunity_false():
-    testPlayer = src.users.add( cli="6697", nick="chubbychicken123!None@None:None" )
-    var.MAIN_ROLES = {testPlayer: "villager"}
-    var.ALL_PLAYERS = [testPlayer]
-    check = src.status.try_lynch_immunity(var= var, user=testPlayer)
-    print(check)
-    assert src.status.try_lynch_immunity( var=None, user=testPlayer ) is False
+def test_add_users():
+    new_user = src.users.add(cli="6697", nick="Hoobshanker!None@None:None")
+    assert new_user.nick == "Hoobshanker"
 
-# changed false -> true lynchimmune.py line 20
 
-def test_try_lynch_immunity_true():
-    testPlayer = src.users.add( cli="6697", nick="chubbychicken123!None@None:None" )
-    var.MAIN_ROLES = {testPlayer: "villager"}
-    var.ALL_PLAYERS = [testPlayer]
-    src.status.add_lynch_immunity( var=None, user=testPlayer, reason=None )
-    assert src.status.try_lynch_immunity(var= var, user=testPlayer)
+def test_get_users():
+    src.users.add(cli="6697", nick="Hoobshanker!None@None:None")
+    check = src.users.get(nick="Hoobshanker!None@None:None")
+    assert check.nick == "Hoobshanker"
+
+
+def test_get_players():
+    new_user = src.users.add(cli="6697", nick="Hoobshanker!None@None:None")
+    var.MAIN_ROLES = {"Hoobshanker": "villager"}
+    var.ALL_PLAYERS = [new_user.nick]
+    check = src.functions.get_players()
+    assert check[0] == "Hoobshanker"
+
+
+
