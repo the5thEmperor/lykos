@@ -62,6 +62,7 @@ from src.context import IRCContext
 from src.status import try_protection, add_dying, is_dying, kill_players, get_absent, is_silent
 from src.votes import chk_decision
 from src.cats import All, Wolf, Wolfchat, Wolfteam, Killer, Village, Neutral, Hidden, role_order
+from src.roles import warlock
 
 from src.functions import (
     get_players, get_all_players, get_participants,
@@ -3016,6 +3017,13 @@ def myrole(var, wrapper, message):
     if not evt.dispatch(var, wrapper.source):
         return
     role = evt.data["role"]
+
+    # Adding code here - Marissa
+    if role == "traitor" and warlock.is_cursed(wrapper.source):
+        role = "cursed traitor"
+        wrapper.pm(messages["show_role"].format(role))
+        return
+    # end of adding code
 
     wrapper.pm(messages["show_role"].format(role))
 
