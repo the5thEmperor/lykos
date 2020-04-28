@@ -9,7 +9,7 @@ from src.messages import messages
 from src.status import try_misdirection, try_exchange, add_dying, kill_players, add_absent
 from src.events import Event
 from src.cats import Wolf, Wolfchat
-
+from src.status.protection import check_protected
 def setup_variables(rolename):
     GUNNERS = UserDict() # type: UserDict[users.User, int]
 
@@ -23,7 +23,10 @@ def setup_variables(rolename):
         target = get_target(var, wrapper, re.split(" +", message)[0], not_self_message="gunner_target_self")
         if not target:
             return
-
+        if check_protected(target):
+            GUNNERS[wrapper.source] -= 1
+            wrapper.send(messages["shoot_at_protected"].format(wrapper.source, target))
+            return
         target = try_misdirection(var, wrapper.source, target)
         if try_exchange(var, wrapper.source, target):
             return
