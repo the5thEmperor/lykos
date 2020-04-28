@@ -72,14 +72,14 @@ def test_is_cursed():
 
 
 def test_add_lycanthropy():
-    user = src.users.add( cli="6697", nick="chubbychicken123!None@None:None" )
+    user = src.users.add( cli="6697", nick="Datsyuk!None@None:None" )
     var.MAIN_ROLES = {user: "villager"}
     var.ALL_PLAYERS = [user]
     src.status.add_lycanthropy(var,user,"lycan")
     print(src.containers.UserDict)
 
 def test_wolves_diseased():
-    user = src.users.add( cli="6697", nick="chubbychicken123!None@None:None" )
+    user = src.users.add( cli="6697", nick="Datsyuk!None@None:None" )
     var.MAIN_ROLES = {user: "villager"}
     var.ALL_PLAYERS = [user]
     src.status.add_disease( var=None, target=user )
