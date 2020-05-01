@@ -3,6 +3,8 @@ import src
 import src.db.db_functions as db_func
 import src.settings as var
 from src.roles import warlock
+import src.db.db_functions as db_func
+from src.containers import UserSet
 
 
 def test_parse_raw_irc_command():

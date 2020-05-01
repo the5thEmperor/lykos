@@ -814,7 +814,7 @@ def _join_player(var, wrapper, who=None, forced=False, *, sanity=True):
         from src import pregame
         with pregame.WAIT_LOCK:
             pregame.WAIT_TOKENS = var.WAIT_TB_INIT
-            pregame.WAIT_LAST   = time.time()
+            pregame.WAIT_LAST = time.time()
         var.GAME_ID = time.time()
         var.PINGED_ALREADY_ACCS = set()
         var.PINGED_ALREADY = set()
@@ -883,7 +883,7 @@ def _join_player(var, wrapper, who=None, forced=False, *, sanity=True):
             if now + timedelta(seconds=var.WAIT_AFTER_JOIN) > var.CAN_START_TIME:
                 var.CAN_START_TIME = now + timedelta(seconds=var.WAIT_AFTER_JOIN)
 
-        var.LAST_STATS = None # reset
+        var.LAST_STATS = None  # reset
         var.LAST_GSTATS = None
         var.LAST_PSTATS = None
         var.LAST_RSTATS = None
@@ -1249,7 +1249,7 @@ def stop_game(var, winner="", abort=False, additional_winners=None, log=True):
     # save some typing
     rolemap = var.ORIGINAL_ROLES
     mainroles = var.ORIGINAL_MAIN_ROLES
-    orig_main = {} # if get_final_role changes mainroles, we want to stash original main role
+    orig_main = {}  # if get_final_role changes mainroles, we want to stash original main role
 
     for player, role in mainroles.items():
         evt = Event("get_final_role", {"role": var.FINAL_ROLES.get(player, role)})
