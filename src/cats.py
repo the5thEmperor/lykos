@@ -4,18 +4,13 @@
 # Wolfchat: Defines the role as having access to wolfchat (depending on var.RESTRICT_WOLFCHAT settings)
 #    The wolfteam wins if the number of wolfchat roles is greater than or equal to the number of other roles alive
 # Wolfteam: Defines the role as wolfteam for determining winners
-# Killer: Roles which can kill other roles during the game. Roles which kill upon or after death (
-#      ms, vg) don't belong in here
+# Killer: Roles which can kill other roles during the game. Roles which kill upon or after death (ms, vg) don't belong in here
 # Village: Defines the role as village for determining winners
 # Neutral: Defines the role as neutral (seen as grey by augur) and not in village or wolfteam when determining winners
-# Win Stealer: Defines the role as a win stealer (
-#      do not win with a built-in team, vigilante can kill them without issue, etc.).
-#    Also seen as grey by augur and win as a separate team if not in neutral (
-#         e.g. all monsters win together, whereas fools win individually)
-# Hidden: Players with hidden roles do not know that they have that role (
-#      told they are default role instead, and win with that team)
-# Safe: Seer sees these roles as they are, instead of as the default role;
-#      usually reserved for village-side special roles
+# Win Stealer: Defines the role as a win stealer (do not win with a built-in team, vigilante can kill them without issue, etc.).
+#    Also seen as grey by augur and win as a separate team if not in neutral (e.g. all monsters win together, whereas fools win individually)
+# Hidden: Players with hidden roles do not know that they have that role (told they are default role instead, and win with that team)
+# Safe: Seer sees these roles as they are, instead of as the default role; usually reserved for village-side special roles
 # Spy: Actively gets information about other players or teams
 # Intuitive: Passively gets information about other players or teams
 # Cursed: Seer sees these roles as wolf
@@ -31,25 +26,22 @@ from src import events
 __all__ = [
     "get", "role_order",
     "Wolf", "Wolfchat", "Wolfteam", "Killer", "Village", "Nocturnal", "Neutral", "Win_Stealer", "Hidden", "Safe",
-    "Spy", "Intuitive", "Cursed", "Innocent", "Team_Switcher", "All", "Category"
+    "Spy", "Intuitive", "Cursed", "Innocent", "Team_Switcher", "All"
 ]
 
 _dict_keys = type(dict().keys())
 
 # Mapping of category names to the categories themselves; populated in Category.__init__
-ROLE_CATS = {}  # type: Dict[str, Category]
+ROLE_CATS = {} # type: Dict[str, Category]
 
-# the ordering in which we list roles (values should be categories, and roles are ordered within
-#      the categories in alphabetical order,
+# the ordering in which we list roles (values should be categories, and roles are ordered within the categories in alphabetical order,
 # with exception that wolf is first in the wolf category and villager is last in the village category)
-# Roles which are always secondary roles in a particular game mode are always listed last (
-#      after everything else is done)
+# Roles which are always secondary roles in a particular game mode are always listed last (after everything else is done)
 ROLE_ORDER = ["Wolf", "Wolfchat", "Wolfteam", "Village", "Hidden", "Win Stealer", "Neutral"]
 
 FROZEN = False
 
 ROLES = {}
-
 
 def get(cat):
     if not FROZEN:
@@ -57,7 +49,6 @@ def get(cat):
     if cat not in ROLE_CATS:
         raise ValueError("{0!r} is not a valid role category".format(cat))
     return ROLE_CATS[cat]
-
 
 def role_order():
     if not FROZEN:
@@ -77,16 +68,13 @@ def role_order():
     buckets["Village"].append("villager")
     return itertools.chain.from_iterable([buckets[tag] for tag in ROLE_ORDER])
 
-
-def _register_roles():
+def _register_roles(evt):
     global FROZEN
     mevt = events.Event("get_role_metadata", {})
     mevt.dispatch(None, "role_categories")
     for role, cats in mevt.data.items():
         if len(cats & {"Wolfteam", "Village", "Neutral", "Hidden"}) != 1:
-            raise RuntimeError(
-                "Invalid categories for {0}: Must have exactly one of "
-                "{{Wolfteam, Village, Neutral, Hidden}}, got {1}".format(role, cats))
+            raise RuntimeError("Invalid categories for {0}: Must have exactly one of {{Wolfteam, Village, Neutral, Hidden}}, got {1}".format(role, cats))
         ROLES[role] = frozenset(cats)
         for cat in cats:
             if cat not in ROLE_CATS or ROLE_CATS[cat] is All:
@@ -98,9 +86,7 @@ def _register_roles():
         cat.freeze()
     FROZEN = True
 
-
 events.EventListener(_register_roles, priority=1).install("init")
-
 
 class Category:
     """Base class for role categories."""
@@ -155,7 +141,7 @@ class Category:
     def __hash__(self):
         try:
             return hash(self._roles)
-        except TypeError:  # still a regular set; not yet frozen
+        except TypeError: # still a regular set; not yet frozen
             raise RuntimeError("Fatal: Role categories are not ready")
 
     def __str__(self):
@@ -190,17 +176,15 @@ class Category:
             return self
         return NotImplemented
 
-    __add__ = __radd__ = lambda self, other: self.from_combination(self, other, "+", set.update)
-    __or__ = __ror__ = lambda self, other: self.from_combination(self, other, "|", set.update)
-    __and__ = __rand__ = lambda self, other: self.from_combination(self, other, "&", set.intersection_update)
-    __xor__ = __rxor__ = lambda self, other: self.from_combination(self, other, "^", set.symmetric_difference_update)
-    __sub__ = lambda self, other: self.from_combination(self, other, "-", set.difference_update)
-    __rsub__ = lambda self, other: self.from_combination(other, self, "-", set.difference_update)
+    __add__ = __radd__  = lambda self, other: self.from_combination(self, other, "+", set.update)
+    __or__  = __ror__   = lambda self, other: self.from_combination(self, other, "|", set.update)
+    __and__ = __rand__  = lambda self, other: self.from_combination(self, other, "&", set.intersection_update)
+    __xor__ = __rxor__  = lambda self, other: self.from_combination(self, other, "^", set.symmetric_difference_update)
+    __sub__             = lambda self, other: self.from_combination(self, other, "-", set.difference_update)
+    __rsub__            = lambda self, other: self.from_combination(other, self, "-", set.difference_update)
 
 # For proper auto-completion support in IDEs, please do not try to "save space" by turning this into a loop
 # and dynamically creating globals.
-
-
 All = Category("All", alias="*")
 Wolf = Category("Wolf")
 Wolfchat = Category("Wolfchat")
