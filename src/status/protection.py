@@ -1,5 +1,3 @@
-from typing import Tuple, Optional, List
-
 from src import users
 from src.containers import UserDict, DefaultUserDict
 from src.decorators import event_listener
@@ -7,16 +5,14 @@ from src.functions import get_players
 from src.messages import messages
 from src.events import Event
 from src.cats import All
-from src.cats import Category
-__all__ = ["add_protection", "try_protection", "remove_all_protections", "check_protected"]
 
-from src.users import User
+__all__ = ["add_protection", "try_protection", "remove_all_protections"]
 
 PROTECTIONS = UserDict()  # type: UserDict[User, UserDict[Optional[User], List[Tuple[Category, str]]]]
 players_who_are_PROTECTED = []  # created list to hold players who is protected
 
 
-def add_protection(target, protector, protector_role, scope=All):
+def add_protection(var, target, protector, protector_role, scope=All):
     """Add a protection to the target affecting the relevant scope."""
     if target not in get_players():
         return
@@ -75,7 +71,7 @@ def remove_all_protections(var, target, attacker, attacker_role, reason, scope=A
 
 
 @event_listener("del_player")
-def on_del_player(player):
+def on_del_player(evt, var, player, all_roles, death_triggers):
     if player in PROTECTIONS:
         del PROTECTIONS[player]
 
@@ -85,25 +81,25 @@ def on_del_player(player):
 
 
 @event_listener("remove_protection")
-def on_remove_protection(evt, target, attacker, protector):
+def on_remove_protection(evt, var, target, attacker, attacker_role, protector, protector_role, reason):
     if attacker is protector:
         evt.data["remove"] = True
         target.send(messages["protector_disappeared"])
 
 
 @event_listener("revealroles")
-def on_revealroles(evt):
+def on_revealroles(evt, var):
     if PROTECTIONS:
         evt.data["output"].append(messages["protection_revealroles"].format(PROTECTIONS))
 
 
 @event_listener("transition_night_begin")
-def on_transition_night_begin():
+def on_transition_night_begin(evt, var):
     PROTECTIONS.clear()
 
 
 @event_listener("reset")
-def on_reset():
+def on_reset(evt, var):
     PROTECTIONS.clear()
 
 # vim: set sw=4 expandtab:
