@@ -31,7 +31,7 @@ from src import events
 __all__ = [
     "get", "role_order",
     "Wolf", "Wolfchat", "Wolfteam", "Killer", "Village", "Nocturnal", "Neutral", "Win_Stealer", "Hidden", "Safe",
-    "Spy", "Intuitive", "Cursed", "Innocent", "Team_Switcher", "All", "Category"
+    "Spy", "Intuitive", "Cursed", "Innocent", "Team_Switcher", "All"
 ]
 
 _dict_keys = type(dict().keys())
