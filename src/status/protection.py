@@ -8,15 +8,16 @@ from src.cats import All
 
 __all__ = ["add_protection", "try_protection", "remove_all_protections"]
 
-PROTECTIONS = UserDict() # type: UserDict[User, UserDict[Optional[User], List[Tuple[Category, str]]]]
-players_who_are_PROTECTED = [] # created list to hold players who is protected
+PROTECTIONS = UserDict()  # type: UserDict[User, UserDict[Optional[User], List[Tuple[Category, str]]]]
+players_who_are_PROTECTED = []  # created list to hold players who is protected
+
 
 def add_protection(var, target, protector, protector_role, scope=All):
     """Add a protection to the target affecting the relevant scope."""
     if target not in get_players():
         return
 
-    players_who_are_PROTECTED.append( target )  # appended target with protection to list
+    players_who_are_PROTECTED.append(target)  # appended target with protection to list
 
     if target not in PROTECTIONS:
         PROTECTIONS[target] = DefaultUserDict(list)
@@ -24,11 +25,13 @@ def add_protection(var, target, protector, protector_role, scope=All):
 
     PROTECTIONS[target][protector].append(prot_entry)
 
-def check_protected(player: users.User): #function to check if player is protected
+
+def check_protected(player: users.User):  # function to check if player is protected
     test = players_who_are_PROTECTED
-    if player in players_who_are_PROTECTED:
+    if player in test:
         return True
     return False
+
 
 def try_protection(var, target, attacker, attacker_role, reason):
     """Attempt to protect the player, and return a list of messages or None."""
@@ -52,6 +55,7 @@ def try_protection(var, target, attacker, attacker_role, reason):
 
     return prot_evt.data["messages"]
 
+
 def remove_all_protections(var, target, attacker, attacker_role, reason, scope=All):
     """Remove all protections from a player."""
     if target not in PROTECTIONS:
@@ -65,6 +69,7 @@ def remove_all_protections(var, target, attacker, attacker_role, reason, scope=A
                 if evt.data["remove"]:
                     PROTECTIONS[target][protector].remove((cat, protector_role))
 
+
 @event_listener("del_player")
 def on_del_player(evt, var, player, all_roles, death_triggers):
     if player in PROTECTIONS:
@@ -74,20 +79,24 @@ def on_del_player(evt, var, player, all_roles, death_triggers):
         if player in entries:
             del entries[player]
 
+
 @event_listener("remove_protection")
 def on_remove_protection(evt, var, target, attacker, attacker_role, protector, protector_role, reason):
     if attacker is protector:
         evt.data["remove"] = True
         target.send(messages["protector_disappeared"])
 
+
 @event_listener("revealroles")
 def on_revealroles(evt, var):
     if PROTECTIONS:
         evt.data["output"].append(messages["protection_revealroles"].format(PROTECTIONS))
 
+
 @event_listener("transition_night_begin")
 def on_transition_night_begin(evt, var):
     PROTECTIONS.clear()
+
 
 @event_listener("reset")
 def on_reset(evt, var):
