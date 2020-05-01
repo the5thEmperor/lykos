@@ -15,6 +15,7 @@ from src.status import try_misdirection, try_exchange
 from src.roles.helper.wolves import get_wolfchat_roles, is_known_wolf_ally, send_wolfchat_message, get_wolflist
 
 CURSED = UserDict() # type: UserDict[users.User, users.User]
+is_CURSED = [] # added by Marissa
 PASSED = UserSet() # type: UserSet[users.Set]
 
 @command("curse", chan=False, pm=True, playing=True, silenced=True, phases=("night",), roles=("warlock",))
@@ -31,9 +32,11 @@ def curse(var, wrapper, message):
     # but for now it is not allowed. If someone seems suspicious and shows as
     # villager across multiple nights, safes can use that as a tell that the
     # person is likely wolf-aligned.
-    if is_known_wolf_ally(var, wrapper.source, target):
-        wrapper.pm(messages["no_curse_wolf"])
-        return
+
+    # Marissa commenting out the following 3 lines in order to have cursed traitors
+    #if is_known_wolf_ally(var, wrapper.source, target):
+    #    wrapper.pm(messages["no_curse_wolf"])
+    #    return
 
     orig = target
     target = try_misdirection(var, wrapper.source, target)
@@ -41,12 +44,20 @@ def curse(var, wrapper, message):
         return
 
     CURSED[wrapper.source] = target
+    is_CURSED.append(target) # added by Marissa
     PASSED.discard(wrapper.source)
 
     wrapper.pm(messages["curse_success"].format(orig))
     send_wolfchat_message(var, wrapper.source, messages["curse_success_wolfchat"].format(wrapper.source, orig), {"warlock"}, role="warlock", command="curse")
 
     debuglog("{0} (warlock) CURSE: {1} ({2})".format(wrapper.source, target, get_main_role(target)))
+
+# Marissa start adding code
+def is_cursed(target: users.User):
+    if target in is_CURSED:
+        return True
+    return False
+# end code
 
 @command("pass", chan=False, pm=True, playing=True, silenced=True, phases=("night",), roles=("warlock",))
 def pass_cmd(var, wrapper, message):

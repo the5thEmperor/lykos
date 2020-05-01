@@ -12,6 +12,8 @@ from src.status import add_dying
 from src.cats import Wolfteam
 from src.decorators import command
 from src import channels, users
+from src.roles.helper import wolves #group added
+from src import setting as var
 
 @game_mode("boreal", minp=6, maxp=24, likelihood=5)
 class BorealMode(GameMode):
@@ -270,6 +272,11 @@ class BorealMode(GameMode):
                 SHAMANS[wrapper.source][totem].append(users.Bot)
                 if len(SHAMANS[wrapper.source][totem]) > TOTEMS[wrapper.source][totem]:
                     SHAMANS[wrapper.source][totem].pop(0)
-
+                nick = wrapper.source
+                role = get_main_role(nick)
                 wrapper.pm(messages["boreal_feed_success"].format(totem))
+                if role == "wolf shaman":
+                    wolves.send_wolfchat_message(var=var, user=wrapper.source,
+                                                 message=messages["boreal_wolf_feed_success"].format(nick, totem),
+                                                 roles="wolf shaman")
                 return

@@ -14,16 +14,18 @@ from src.messages import messages
 from src.status import try_misdirection, try_exchange, is_silent
 from src.cats import Win_Stealer
 
-from src.roles.helper.shamans import setup_variables, get_totem_target, give_totem, totem_message
+from src.roles.helper.shamans import setup_variables, get_totem_target, give_totem, totem_message, crazed_totem_message
 
 TOTEMS, LASTGIVEN, SHAMANS, RETARGET = setup_variables("crazed shaman", knows_totem=False)
+
 
 @command("totem", chan=False, pm=True, playing=True, silenced=True, phases=("night",), roles=("crazed shaman",))
 def crazed_shaman_totem(var, wrapper, message):
     """Give a random totem to a player."""
 
     totem_types = list(TOTEMS[wrapper.source].keys())
-    totem, target = get_totem_target(var, wrapper, message, LASTGIVEN, []) # don't pass totem_types so they can't autocomplete what random totems they have
+    # don't pass totem_types so they can't autocomplete what random totems they have
+    totem, target = get_totem_target(var, wrapper, message, LASTGIVEN, [])
     if not target:
         return
 
@@ -34,7 +36,7 @@ def crazed_shaman_totem(var, wrapper, message):
         if given < total:
             totem = type
             break
-    else: # all totems are given out, change targets for a random one
+    else:  # all totems are given out, change targets for a random one
         totem = random.choice(totem_types)
 
     orig_target = target
@@ -49,13 +51,15 @@ def crazed_shaman_totem(var, wrapper, message):
         if victim is not target:
             RETARGET[wrapper.source][target] = victim
         SHAMANS[wrapper.source][totem].append(victim)
-        if len(SHAMANS[wrapper.source][totem]) > TOTEMS[wrapper.source][totem]:
+        if len(SHAMANS[wrapper.source][totem]) > TOTEMS[wrapper.source][totem] + 1:  # Jimmy added fix to add totem
             SHAMANS[wrapper.source][totem].pop(0)
+
 
 @event_listener("player_win")
 def on_player_win(evt, var, player, main_role, all_roles, winner, team_win, survived):
     if main_role == "crazed shaman" and survived and singular(winner) not in Win_Stealer:
         evt.data["individual_win"] = True
+
 
 @event_listener("transition_day_begin", priority=4)
 def on_transition_day_begin(evt, var):
@@ -82,6 +86,7 @@ def on_transition_day_begin(evt, var):
                     given = give_totem(var, dispatcher, target, totem, key="shaman_success_random_unknown", role="crazed shaman")
                     if given:
                         SHAMANS[shaman][totem].append(given[0])
+
 
 @event_listener("transition_night_end", priority=2.01)
 def on_transition_night_end(evt, var):
@@ -127,8 +132,9 @@ def on_transition_night_end(evt, var):
             shaman.send(messages["shaman_notify_multiple_random"].format("crazed shaman"))
         else:
             shaman.send(messages["shaman_notify"].format("crazed shaman"))
-        shaman.send(totem_message(TOTEMS[shaman], count_only=True))
+        shaman.send(crazed_totem_message(TOTEMS[shaman], count_only=True))  # Jimmy updated function call
         shaman.send(messages["players_list"].format(pl))
+
 
 @event_listener("get_role_metadata")
 def on_get_role_metadata(evt, var, kind):
@@ -136,8 +142,11 @@ def on_get_role_metadata(evt, var, kind):
         evt.data["crazed shaman"] = {"Neutral", "Nocturnal"}
     elif kind == "lycanthropy_role":
         evt.data["crazed shaman"] = {"role": "wolf shaman", "prefix": "shaman"}
+RETARGET
+
 
 @event_listener("default_totems")
 def set_crazed_totems(evt, chances):
     for chance in chances.values():
         chance["crazed shaman"] = 1
+
