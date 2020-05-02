@@ -1,19 +1,17 @@
-import random
 import re
 from collections import defaultdict
-from typing import List, Tuple, Dict
-from src.gamemodes import game_mode, GameMode, InvalidModeException
+from typing import Dict
+from src.gamemodes import game_mode, GameMode
 from src.messages import messages
-from src.functions import get_players, get_all_players, get_main_role, change_role
+from src.functions import get_players, get_main_role, change_role
 from src.utilities import complete_one_match
-from src.events import EventListener, find_listener
+from src.events import EventListener
 from src.containers import DefaultUserDict
 from src.status import add_dying
 from src.cats import Wolfteam
 from src.decorators import command
-from src import channels, users
+from src import users
 from src.roles.helper import wolves  # group added
-from src import setting as var
 
 
 @game_mode("boreal", minp=6, maxp=24, likelihood=5)
