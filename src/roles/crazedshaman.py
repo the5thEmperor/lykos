@@ -1,7 +1,6 @@
 import random
 import itertools
 from src.utilities import *
-
 from src.functions import get_players, get_all_players
 from src.decorators import command, event_listener
 from src.events import Event
