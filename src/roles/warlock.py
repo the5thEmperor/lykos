@@ -14,9 +14,10 @@ from src.status import try_misdirection, try_exchange
 
 from src.roles.helper.wolves import get_wolfchat_roles, is_known_wolf_ally, send_wolfchat_message, get_wolflist
 
-CURSED = UserDict() # type: UserDict[users.User, users.User]
-is_CURSED = [] # added by Marissa
-PASSED = UserSet() # type: UserSet[users.Set]
+CURSED = UserDict()  # type: UserDict[users.User, users.User]
+is_CURSED = []  # added by Marissa
+PASSED = UserSet()  # type: UserSet[users.Set]
+
 
 @command("curse", chan=False, pm=True, playing=True, silenced=True, phases=("night",), roles=("warlock",))
 def curse(var, wrapper, message):
@@ -34,7 +35,7 @@ def curse(var, wrapper, message):
     # person is likely wolf-aligned.
 
     # Marissa commenting out the following 3 lines in order to have cursed traitors
-    #if is_known_wolf_ally(var, wrapper.source, target):
+    # if is_known_wolf_ally(var, wrapper.source, target):
     #    wrapper.pm(messages["no_curse_wolf"])
     #    return
 
@@ -48,9 +49,11 @@ def curse(var, wrapper, message):
     PASSED.discard(wrapper.source)
 
     wrapper.pm(messages["curse_success"].format(orig))
-    send_wolfchat_message(var, wrapper.source, messages["curse_success_wolfchat"].format(wrapper.source, orig), {"warlock"}, role="warlock", command="curse")
+    send_wolfchat_message(var, wrapper.source, messages["curse_success_wolfchat"].format(wrapper.source, orig),
+                          {"warlock"}, role="warlock", command="curse")
 
     debuglog("{0} (warlock) CURSE: {1} ({2})".format(wrapper.source, target, get_main_role(target)))
+
 
 # Marissa start adding code
 def is_cursed(target: users.User):
@@ -59,6 +62,7 @@ def is_cursed(target: users.User):
     return False
 # end code
 
+
 @command("pass", chan=False, pm=True, playing=True, silenced=True, phases=("night",), roles=("warlock",))
 def pass_cmd(var, wrapper, message):
     """Decline to use your special power for that night."""
@@ -66,9 +70,11 @@ def pass_cmd(var, wrapper, message):
     PASSED.add(wrapper.source)
 
     wrapper.pm(messages["warlock_pass"])
-    send_wolfchat_message(var, wrapper.source, messages["warlock_pass_wolfchat"].format(wrapper.source), {"warlock"}, role="warlock", command="pass")
+    send_wolfchat_message(var, wrapper.source, messages["warlock_pass_wolfchat"].format(wrapper.source), {"warlock"},
+                          role="warlock", command="pass")
 
     debuglog("{0} (warlock) PASS".format(wrapper.source))
+
 
 @command("retract", chan=False, pm=True, playing=True, silenced=True, phases=("night",), roles=("warlock",))
 def retract(var, wrapper, message):
@@ -77,9 +83,11 @@ def retract(var, wrapper, message):
     PASSED.discard(wrapper.source)
 
     wrapper.pm(messages["warlock_retract"])
-    send_wolfchat_message(var, wrapper.source, messages["warlock_retract_wolfchat"].format(wrapper.source), {"warlock"}, role="warlock", command="retract")
+    send_wolfchat_message(var, wrapper.source, messages["warlock_retract_wolfchat"].format(wrapper.source), {"warlock"}
+                          , role="warlock", command="retract")
 
     debuglog("{0} (warlock) RETRACT".format(wrapper.source))
+
 
 @event_listener("chk_nightdone")
 def on_chk_nightdone(evt, var):
@@ -87,10 +95,12 @@ def on_chk_nightdone(evt, var):
     evt.data["acted"].extend(PASSED)
     evt.data["nightroles"].extend(get_all_players(("warlock",)))
 
+
 @event_listener("del_player")
 def on_del_player(evt, var, player, allroles, death_triggers):
     del CURSED[:player:]
     PASSED.discard(player)
+
 
 @event_listener("new_role")
 def on_new_role(evt, var, user, old_role):
@@ -101,6 +111,7 @@ def on_new_role(evt, var, user, old_role):
     if not evt.data["in_wolfchat"] and evt.data["role"] == "warlock":
         # this means warlock isn't in wolfchat, so only give cursed list
         user.send(messages["players_list"].format(get_wolflist(var, user)))
+
 
 @event_listener("begin_day")
 def on_begin_day(evt, var):
@@ -113,10 +124,12 @@ def on_begin_day(evt, var):
     CURSED.clear()
     PASSED.clear()
 
+
 @event_listener("reset")
 def on_reset(evt, var):
     CURSED.clear()
     PASSED.clear()
+
 
 @event_listener("get_role_metadata")
 def on_get_role_metadata(evt, var, kind):

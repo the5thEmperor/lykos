@@ -12,8 +12,9 @@ from src.status import add_dying
 from src.cats import Wolfteam
 from src.decorators import command
 from src import channels, users
-from src.roles.helper import wolves #group added
+from src.roles.helper import wolves  # group added
 from src import setting as var
+
 
 @game_mode("boreal", minp=6, maxp=24, likelihood=5)
 class BorealMode(GameMode):
@@ -69,7 +70,8 @@ class BorealMode(GameMode):
         self.TOTEM_CHANCES["pacifism"]["wolf shaman"] = 10
 
         self.hunger_levels = DefaultUserDict(int)
-        self.totem_tracking = defaultdict(int) # no need to make a user container, this is only non-empty a very short time
+        self.totem_tracking = defaultdict(int)
+        # no need to make a user container, this is only non-empty a very short time
         self.phase = 1
         self.max_nights = 7
         self.village_hunger = 0
@@ -98,12 +100,14 @@ class BorealMode(GameMode):
         messages.messages["vengeful_turn"] = messages.messages["boreal_turn"]
         messages.messages["lynch_reveal"] = messages.messages["boreal_exile"]
 
-        kwargs = dict(chan=False, pm=True, playing=True, silenced=True, phases=("night",), roles=("shaman", "wolf shaman"))
+        kwargs = dict(chan=False, pm=True, playing=True, silenced=True, phases=("night",), roles=("shaman"
+                                                                                                  , "wolf shaman"))
         self.feed_command = command("feed", **kwargs)(self.feed)
 
     def teardown(self):
         from src import decorators
         super().teardown()
+
         def remove_command(name, command):
             if len(decorators.COMMANDS[name]) > 1:
                 decorators.COMMANDS[name].remove(command)
@@ -136,7 +140,8 @@ class BorealMode(GameMode):
             self.phase = 2
         # determine how many tribe members need to be fed. It's a percentage of remaining shamans
         # Each alive WS reduces the percentage needed; the number is rounded off (.5 rounding to even)
-        percent = self.village_hunger_percent_base - self.village_hunger_percent_adj * len(get_players(("wolf shaman",)))
+        percent = self.village_hunger_percent_base - self.village_hunger_percent_adj * len(get_players(("wolf shaman",))
+                                                                                           )
         self.village_hunger = round(len(get_players(("shaman",))) * percent)
 
     def on_wolf_numkills(self, evt, var):
