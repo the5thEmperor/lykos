@@ -10,7 +10,7 @@ from src.messages import messages
 from src.status import is_silent
 from src.cats import Win_Stealer
 
-from src.roles.helper.shamans import setup_variables, get_totem_target, give_totem, totem_message
+from src.roles.helper.shamans import setup_variables, get_totem_target, give_totem, totem_message, crazed_totem_message
 
 TOTEMS, LASTGIVEN, SHAMANS, RETARGET = setup_variables("crazed shaman", knows_totem=False)
 
@@ -47,7 +47,7 @@ def crazed_shaman_totem(var, wrapper, message):
         if victim is not target:
             RETARGET[wrapper.source][target] = victim
         SHAMANS[wrapper.source][totem].append(victim)
-        if len(SHAMANS[wrapper.source][totem]) > TOTEMS[wrapper.source][totem]:
+        if len(SHAMANS[wrapper.source][totem]) > TOTEMS[wrapper.source][totem] + 1:  # Jimmy added fix to add totem
             SHAMANS[wrapper.source][totem].pop(0)
 
 
@@ -128,7 +128,7 @@ def on_transition_night_end(evt, var):
             shaman.send(messages["shaman_notify_multiple_random"].format("crazed shaman"))
         else:
             shaman.send(messages["shaman_notify"].format("crazed shaman"))
-        shaman.send(totem_message(TOTEMS[shaman], count_only=True))
+        shaman.send(crazed_totem_message(TOTEMS[shaman], count_only=True))  # Jimmy updated function call
         shaman.send(messages["players_list"].format(pl))
 
 
@@ -138,9 +138,12 @@ def on_get_role_metadata(evt, var, kind):
         evt.data["crazed shaman"] = {"Neutral", "Nocturnal"}
     elif kind == "lycanthropy_role":
         evt.data["crazed shaman"] = {"role": "wolf shaman", "prefix": "shaman"}
+RETARGET
+
 
 
 @event_listener("default_totems")
 def set_crazed_totems(evt, chances):
     for chance in chances.values():
         chance["crazed shaman"] = 1
+

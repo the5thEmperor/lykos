@@ -18,7 +18,7 @@
 # WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 # OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 # ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
+import argparse
 import copy
 import fnmatch
 import functools
@@ -41,7 +41,7 @@ import urllib.request
 
 from collections import defaultdict, deque, Counter
 from datetime import datetime, timedelta
-from typing import Set, Optional, Callable
+from typing import Set, Optional, Callable, Tuple
 
 from oyoyo.parse import parse_nick
 
@@ -62,6 +62,7 @@ from src.context import IRCContext
 from src.status import try_protection, add_dying, is_dying, kill_players, get_absent, is_silent
 from src.votes import chk_decision
 from src.cats import All, Wolf, Wolfchat, Wolfteam, Killer, Village, Neutral, Hidden, role_order
+from src.roles import warlock
 
 from src.functions import (
     get_players, get_all_players, get_participants,
@@ -121,7 +122,7 @@ var.GAME_START_TIME = datetime.now()  # for idle checker only
 var.CAN_START_TIME = 0
 var.STARTED_DAY_PLAYERS = 0
 
-var.DISCONNECTED = {}  # players who are still alive but disconnected
+var.DISCONNECTED = UserDict() # type: UserDict[User, Tuple[datetime, str]]
 
 var.RESTARTING = False
 
@@ -241,42 +242,6 @@ def connect_callback():
 
     accumulator = accumulate_cmodes(3)
     accumulator.send(None)
-
-@hook("mode") # XXX Get rid of this when the user/channel refactor is done
-def check_for_modes(cli, rnick, chan, modeaction, *target):
-    nick = parse_nick(rnick)[0]
-    if chan != botconfig.CHANNEL:
-        return
-    oldpref = ""
-    trgt = ""
-    keeptrg = False
-    target = list(target)
-    if target and target != [users.Bot.nick]:
-        while modeaction:
-            if len(modeaction) > 1:
-                prefix = modeaction[0]
-                change = modeaction[1]
-            else:
-                prefix = oldpref
-                change = modeaction[0]
-            if not keeptrg:
-                if target:
-                    trgt = target.pop(0)
-                else:
-                    trgt = "" # Last item, no target
-            keeptrg = False
-            if not prefix in ("-", "+"):
-                change = prefix
-                prefix = oldpref
-            else:
-                oldpref = prefix
-            modeaction = modeaction[modeaction.index(change)+1:]
-            if change in var.MODES_NOSET:
-                keeptrg = True
-            if prefix == "-" and change in var.MODES_ONLYSET:
-                keeptrg = True
-            if change not in var.MODES_PREFIXES.values():
-                continue
 
 def reset_settings():
     var.CURRENT_GAMEMODE.teardown()
@@ -824,7 +789,14 @@ def _join_player(var, wrapper, who=None, forced=False, *, sanity=True):
 
     # don't check unacked warnings on fjoin
     if wrapper.source is who and db.has_unacknowledged_warnings(temp.account):
-        wrapper.pm(messages["warn_unacked"])
+        # wrapper.pm(messages["warn_unacked"])
+
+        args = argparse.Namespace() # arg added to pass into warn list function
+        args.all = False
+        args.help = False
+        args.page = 1
+        # Called warn list function instead of messaging to use warn list to see warnings
+        src.warnings.warn_list(var, wrapper, args)
         return False
 
     cmodes = []
@@ -842,7 +814,7 @@ def _join_player(var, wrapper, who=None, forced=False, *, sanity=True):
         from src import pregame
         with pregame.WAIT_LOCK:
             pregame.WAIT_TOKENS = var.WAIT_TB_INIT
-            pregame.WAIT_LAST   = time.time()
+            pregame.WAIT_LAST = time.time()
         var.GAME_ID = time.time()
         var.PINGED_ALREADY_ACCS = set()
         var.PINGED_ALREADY = set()
@@ -911,7 +883,7 @@ def _join_player(var, wrapper, who=None, forced=False, *, sanity=True):
             if now + timedelta(seconds=var.WAIT_AFTER_JOIN) > var.CAN_START_TIME:
                 var.CAN_START_TIME = now + timedelta(seconds=var.WAIT_AFTER_JOIN)
 
-        var.LAST_STATS = None # reset
+        var.LAST_STATS = None  # reset
         var.LAST_GSTATS = None
         var.LAST_PSTATS = None
         var.LAST_RSTATS = None
@@ -1277,7 +1249,7 @@ def stop_game(var, winner="", abort=False, additional_winners=None, log=True):
     # save some typing
     rolemap = var.ORIGINAL_ROLES
     mainroles = var.ORIGINAL_MAIN_ROLES
-    orig_main = {} # if get_final_role changes mainroles, we want to stash original main role
+    orig_main = {}  # if get_final_role changes mainroles, we want to stash original main role
 
     for player, role in mainroles.items():
         evt = Event("get_final_role", {"role": var.FINAL_ROLES.get(player, role)})
@@ -1818,7 +1790,7 @@ def account_change(evt, user, old_account): # FIXME: This uses var
         return # We only care about game-related changes in this function
 
     pl = get_participants()
-    if user in pl and user.account not in var.JOINED_THIS_GAME_ACCS:
+    if user in pl and user.account not in var.JOINED_THIS_GAME_ACCS and user not in var.DISCONNECTED:
         leave(var, "account", user) # this also notifies the user to change their account back
         if var.PHASE != "join":
             channels.Main.mode(["-v", user.nick])
@@ -2815,7 +2787,7 @@ def on_invite(cli, raw_nick, something, chan):
     if chan == botconfig.CHANNEL:
         cli.join(chan)
         return # No questions
-    user = users.get(raw_nick)
+    user = users.get(raw_nick, allow_none=True)
     if user and user.is_admin():
         cli.join(chan) # Allows the bot to be present in any channel
         debuglog(user.nick, "INVITE", chan, display=True)
@@ -3045,6 +3017,13 @@ def myrole(var, wrapper, message):
     if not evt.dispatch(var, wrapper.source):
         return
     role = evt.data["role"]
+
+    # Adding code here - Marissa
+    if role == "traitor" and warlock.is_cursed(wrapper.source):
+        role = "cursed traitor"
+        wrapper.pm(messages["show_role"].format(role))
+        return
+    # end of adding code
 
     wrapper.pm(messages["show_role"].format(role))
 
