@@ -8,7 +8,6 @@ from src.dispatcher import MessageDispatcher
 from src.messages import messages
 from src.status import is_silent
 from src.cats import Win_Stealer
-
 from src.roles.helper.shamans import setup_variables, get_totem_target, give_totem, totem_message, crazed_totem_message
 
 TOTEMS, LASTGIVEN, SHAMANS, RETARGET = setup_variables("crazed shaman", knows_totem=False)
