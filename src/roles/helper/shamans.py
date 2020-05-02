@@ -273,6 +273,19 @@ def totem_message(totems, count_only=False):
         return messages["shaman_totem_multiple_known"].format(pieces)
 
 
+# Jimmy created new function for crazed shaman messages
+def crazed_totem_message(totems, count_only=True):
+    totemcount = 2
+    if not count_only and totemcount == 1:
+        totem = list(totems.keys())[0]
+        return messages["shaman_totem"].format(totem)
+    elif count_only:
+        return messages["shaman_totem_multiple_unknown"].format(totemcount)
+    else:
+        pieces = [messages["shaman_totem_piece"].format(num, totem) for totem, num in totems.items()]
+        return messages["shaman_totem_multiple_known"].format(pieces)
+
+
 def get_totem_target(var, wrapper, message, lastgiven, totems) -> Tuple[Optional[str], Optional[users.User]]:
     """Get the totem target."""
     pieces = re.split(" +", message)
