@@ -216,6 +216,7 @@ class handle_error:
             args = [self.instance] + args
         with print_traceback():
             return self.func(*args, **kwargs)
+            return self.func(*args, **kwargs)
 
 class command:
     def __init__(self, command: str, *, flag: Optional[str] = None, owner_only: bool = False,
