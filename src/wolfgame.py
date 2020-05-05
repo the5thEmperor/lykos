@@ -109,7 +109,7 @@ var.GAME_START_TIME = datetime.now()  # for idle checker only
 var.CAN_START_TIME = 0
 var.STARTED_DAY_PLAYERS = 0
 
-var.DISCONNECTED = UserDict() # type: UserDict[User, Tuple[datetime, str]]
+var.DISCONNECTED = UserDict()  # type: UserDict[User, Tuple[datetime, str]]
 
 var.RESTARTING = False
 
@@ -242,7 +242,7 @@ def reset_settings():
 
 def reset_modes_timers(var):
     # Reset game timers
-    with var.WARNING_LOCK: # make sure it isn't being used by the ping join handler
+    with var.WARNING_LOCK:  # make sure it isn't being used by the ping join handler
         for x, timr in var.TIMERS.items():
             timr[0].cancel()
         var.TIMERS = {}
@@ -775,7 +775,7 @@ def join_player(var,
         return
 
     if _join_player(var, wrapper, who, forced, sanity=sanity) and callback:
-        callback() # FIXME: join_player should be async and return bool; caller can await it for result
+        callback()  # FIXME: join_player should be async and return bool; caller can await it for result
 
 
 def _join_player(var, wrapper, who=None, forced=False, *, sanity=True):
@@ -1311,7 +1311,8 @@ def stop_game(var, winner="", abort=False, additional_winners=None, log=True):
         channels.Main.send(*roles_msg)
 
     # map player: all roles of that player (for below)
-    allroles = {player: frozenset({role for role, players in rolemap.items() if player in players}) for player in mainroles}
+    allroles = {player: frozenset({role for role,
+                                            players in rolemap.items() if player in players}) for player in mainroles}
 
     # "" indicates everyone died or abnormal game stop
     winners = set()
@@ -1861,17 +1862,17 @@ def cleanup_user(evt, var, user):
 
 
 @event_listener("chan_part")
-def left_channel(evt, chan, user, reason): # FIXME: This uses var
+def left_channel(evt, chan, user, reason):  # FIXME: This uses var
     leave(var, "part", user, chan)
 
 
-@event_listener("chan_kick") # FIXME: This uses var
+@event_listener("chan_kick")  # FIXME: This uses var
 def channel_kicked(evt, chan, actor, user, reason):
     leave(var, "kick", user, chan)
 
 
 @event_listener("server_quit")
-def quit_server(evt, user, reason): # FIXME: This uses var
+def quit_server(evt, user, reason):  # FIXME: This uses var
     leave(var, "quit", user, reason)
 
 
@@ -2086,6 +2087,7 @@ def night_timeout(gameid):
             var.NIGHT_IDLED.add(player)
 
     event.data["transition_day"](gameid)
+
 
 @handle_error
 def transition_day(gameid=0):
@@ -2784,7 +2786,7 @@ def get_help(var, wrapper, message):
         for name, fn in COMMANDS.items():
             if fn[0].flag and name not in fn[0].aliases:
                 afns.append(name)
-    fns.sort() # Output commands in alphabetical order
+    fns.sort()  # Output commands in alphabetical order
     wrapper.pm(messages["commands_list"].format(fns))
     if afns:
         afns.sort()
@@ -2855,10 +2857,10 @@ def wiki(var, wrapper, message):
 def on_invite(cli, raw_nick, something, chan):
     if chan == botconfig.CHANNEL:
         cli.join(chan)
-        return # No questions
+        return  # No questions
     user = users.get(raw_nick, allow_none=True)
     if user and user.is_admin():
-        cli.join(chan) # Allows the bot to be present in any channel
+        cli.join(chan)  # Allows the bot to be present in any channel
         debuglog(user.nick, "INVITE", chan, display=True)
 
 
@@ -2868,7 +2870,8 @@ def show_admins(var, wrapper, message):
 
     admins = []
 
-    if wrapper.public and var.LAST_ADMINS and var.LAST_ADMINS + timedelta(seconds=var.ADMINS_RATE_LIMIT) > datetime.now():
+    if wrapper.public and var.LAST_ADMINS and \
+            var.LAST_ADMINS + timedelta(seconds=var.ADMINS_RATE_LIMIT) > datetime.now():
         wrapper.pm(messages["command_ratelimited"])
         return
 
@@ -2996,7 +2999,8 @@ def list_roles(var, wrapper, message):
         gamemode = var.GAME_MODES["default"][0]()
 
     if (not pieces[0] or pieces[0].isdigit()) and not hasattr(gamemode, "ROLE_GUIDE"):
-        wrapper.reply("There {0} \u0002{1}\u0002 playing. {2}roles is disabled for the {3} game mode.".format("is" if lpl == 1 else "are", lpl, botconfig.CMD_CHAR, gamemode.name), prefix_nick=True)
+        wrapper.reply("There {0} \u0002{1}\u0002 playing. {2}roles is disabled for the {3} game mode.".format(
+            "is" if lpl == 1 else "are", lpl, botconfig.CMD_CHAR, gamemode.name), prefix_nick=True)
         return
 
     msg = []
@@ -3641,7 +3645,8 @@ def revealroles(var, wrapper, message):
                 evt.dispatch(var, user, role)
                 special_case = evt.data["special_case"]
 
-                if not evt.prevent_default and user not in var.ORIGINAL_ROLES[role] and role not in var.CURRENT_GAMEMODE.SECONDARY_ROLES:
+                if not evt.prevent_default and user not in var.ORIGINAL_ROLES[role] and\
+                        role not in var.CURRENT_GAMEMODE.SECONDARY_ROLES:
                     for old_role in role_order(): # order doesn't matter here, but oh well
                         if user in var.ORIGINAL_ROLES[old_role] and user not in var.ROLES[old_role]:
                             special_case.append(messages["revealroles_old_role"].format(old_role))
