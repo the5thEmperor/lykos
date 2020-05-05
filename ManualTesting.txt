@@ -1,0 +1,80 @@
+Manual Testing Plan
+Test case id: JIM1
+Unit to test: Function crazed_shaman_totem in crazedshaman.py
+Assumptions: The altered code will give two totems for the crazed shaman to give out.
+Test data:
+1.	Variables:
+a.	var: settings.py imported
+b.	wrapper: dispatcher object containing client information
+c.	message: the input provided by a player
+d.	totem_types: list of all totems the player has.
+e.	totem: the totem that is being given to the target
+f.	target: the p?layer that is receiving the totem
+g.	given: the amount of totems the crazed shaman has given
+h.	total: the amount of types of totems the crazed shaman have given
+i.	given: reassigned to bool to determine if target was given totem
+j.	victim : player who
+k.	target : player who received totem
+l.	SHAMANS: list of players who are shamans
+Steps to be executed: Start the game type “roles” on freenode.net with the crazed shaman as a role. Go the wolbot private message and give out two totems.
+Expected Result:  The PM from the wolfbot should read that the crazed shaman has 2 totems to give out. It should allow the crazed shaman to give to two players and have them receive when the game changes to daytime.
+Actual Result: The bot did PM that the crazed shaman had 2 totems to give, and the two targets given totems were indicated to have received them.
+Pass/Fail: Pass
+Comments: None
+
+
+
+
+
+
+
+Test case id: JIM2
+Unit to test: Function crazed_shaman_totem in crazedshaman.py
+Assumptions: The altered code will give two totems for the crazed shaman to give out.
+Test data:
+1.	Variables:
+a.	var: settings.py imported
+b.	wrapper: dispatcher object containing client information
+c.	message: the input provided by a player
+d.	totem_types: list of all totems the player has.
+e.	totem: the totem that is being given to the target
+f.	target: the p?layer that is receiving the totem
+g.	given: the amount of totems the crazed shaman has given
+h.	total: the amount of types of totems the crazed shaman have given
+i.	given: reassigned to bool to determine if target was given totem
+j.	victim : player who
+k.	target : player who received totem
+l.	SHAMANS: list of players who are shamans
+Steps to be executed: Start the game type “roles” on freenode.net with the crazed shaman as a role. Go the wolbot private message and attempt to give out 3 or more totems.
+Expected Result:  The PM from the wolfbot should read that the crazed shaman has 2 totems to give out. It should record the last two players given a totem and only give a totem to them, ignoring all preceding give commands.
+Actual Result: The bot did PM that the crazed shaman had 2 totems to give, and the two targets who were last given totems were indicated to have received them.
+Pass/Fail: Pass
+Comments: It does allow the crazed shaman to give out more than two totems without causing error, however it does only record the last two given as expected.
+
+
+
+
+
+
+
+
+Test case id: Group1
+Unit to test: Feed function in the boreal.py file
+Assumptions: The feed command will be relayed in the wolf chat
+Test data:
+1.	Variables:
+a.	Var: settings.py imported
+b.	Message: the message the player typed in
+c.	pieces: the split message the player inputed
+d.	valid: a tuple of valid totems that can use feed with
+e.	wrapper: a dispatcher object which holds client info
+f.	totem_types: a list of the types of totems the player has
+g.	given: check if the totem the player has is the correct type
+h.	SHAMANS: list of all shaman players
+i.	nick: the username of the player who used the feed command
+j.	role: the role of the player
+Steps to be executed: Start the game type “boreal” on freenode.net with at least 6 players. Use the !fday commands and !fnight commands as needed to cycle through until a wolf shaman receives a sustenance or a hunger totem. Use the command feed to “give it to the tribe”.
+Expected Result:  The player who used feed should receive a message indicating the command was successful. The players who are wolves should see the message that the player has given their totem to tribe.
+Actual Result: The wolfbot did PM the player at a successful feed command and PM’ed all wolves to indicate when a wolf used the feed command.
+Pass/Fail: Pass
+Comments: None
