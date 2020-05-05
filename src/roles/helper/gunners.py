@@ -1,6 +1,5 @@
 import random
 import re
-
 from src import users
 from src.decorators import command, event_listener
 from src.containers import UserDict

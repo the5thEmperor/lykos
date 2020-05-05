@@ -7,6 +7,7 @@ from src.events import Event
 from src.cats import All
 
 __all__ = ["add_protection", "try_protection", "remove_all_protections"]
+
 PROTECTIONS = UserDict()  # type: UserDict[User, UserDict[Optional[User], List[Tuple[Category, str]]]]
 players_who_are_PROTECTED = []  # created list to hold players who is protected
 
