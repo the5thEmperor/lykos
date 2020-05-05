@@ -55,6 +55,27 @@ Comments: It does allow the crazed shaman to give out more than two totems witho
 
 
 
+Test case id: Marissa_manual_test
+Unit to test: !myrole function in wolfgame.py
+Assumptions: When the traitor is cursed, the command !myrole should show that he is cursed.
+Test data:
+•	Var – imported file settings.py
+•	Wrapper – An object created from the message dispatcher class
+•	Message – The input the player typed
+•	Ps – all participants in the game
+•	Role – the assigned role of the player who used the command “!myrole”
+•	Evt – a object created from the event class
+Steps to be executed:
+1.	Need 7 players to test fix per game rules (4 villagers, 1 wolf, 1 traitor, and 1 warlock).
+2.	When setting up the game, the admin should assign the Traitor role, and the Warlock role. (Use the admin command !fgame roles=villagers:4,wolf:1,warlock:1,traitor:1)
+3.	The Warlock should curse the Traitor
+4.	Once cursed, the Traitor should implement the !myrole command
+Expected Result: The bot should display “cursed traitor” when the command is executed
+Actual result:  The bot does display “cursed traitor” when the command is executed
+Pass/Fail:  Pass
+Comments: None
+
+
 
 
 
