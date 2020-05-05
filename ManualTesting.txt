@@ -79,6 +79,30 @@ Comments: None
 
 
 
+Test Case ID: Jarad Manual Test
+Unit to Test: Protection from gunner in protection.py, gunners.py
+Assumptions: When granted protection the gunner should miss the shot and lose his bullet.
+Testing data:
+1.	var from importing settings.py
+2.	wrapper for receiving user data
+3.	message commands received from users
+4.	check_protected to see if player can be hit
+5.	players_who_are_PROTECTED to be used with check_protected
+6.	GUNNERS[wrapper.source] to handle bullet count
+7.	PROTECTIONS to hold players who are protected
+8.	target to be used with all protection
+Steps to be executed: Run a game with an admin giving roles of at least 1 wolf, 1 angel, 1 gunner, and 1 villager. Have the angel give out
+    protection to the villager and have the gunner try to shoot the same villager.
+Expected results: The gunner should miss his shot and lose his bullet. The villager revealed as protected and lose their protection.
+Actual results: The gunner does not hit the target and loses his bullet. The villager’s protection worked, and they lost the protection.
+Pass/Fail: Pass
+Comments: Protection only lasts for the night that it was granted so even if the villager with protection did not get targeted by the gunner,
+    they lose protection in the morning
+
+
+
+
+
 Test case id: Group1
 Unit to test: Feed function in the boreal.py file
 Assumptions: The feed command will be relayed in the wolf chat
