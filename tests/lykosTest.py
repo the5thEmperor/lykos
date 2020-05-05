@@ -75,8 +75,8 @@ def test_add_lycanthropy():
     user = src.users.add(cli="6697", nick="Datsyuk!None@None:None")
     var.MAIN_ROLES = {user: "villager"}
     var.ALL_PLAYERS = [user]
-    src.status.add_lycanthropy(var, user, "lycan")
-    print(src.containers.UserDict)
+    assert src.status.add_lycanthropy(var, user, "lycan")
+
 
 
 def test_wolves_diseased():
