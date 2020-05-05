@@ -103,6 +103,27 @@ Comments: Protection only lasts for the night that it was granted so even if the
 
 
 
+Test case id: Emily_test
+Unit to test: Bot should PM plays any unacknowledged warnings when trying to join a game.
+Assumptions: Any warming will be showed to the players without the need to request the warning list
+Variable Data:
+    •  Var: imported from settings.py
+    •  Wrapper: object to interpret user information
+    •  Message: user input used by wrapper
+    •  Warn_list: calls the warnings for the users
+    •  _join_player: gets warnings to player while join them to the game
+    •  Db.sql: contains warnings for the users
+    •  Warnings.py: handles the making storing and getting warnings
+Steps to be executed: Run the game normally. If no warnings arrive for the players run the game again until they do.
+Expected results: A list of warnings should be given to the player without them having to request the list.
+Actual result: A list of warnings are displayed to the players.
+Pass/Fail: Pass
+Comments: Sometimes there are no warnings and other there are.
+
+
+
+
+
 Test case id: Group1
 Unit to test: Feed function in the boreal.py file
 Assumptions: The feed command will be relayed in the wolf chat
